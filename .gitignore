@@ -1,0 +1,24 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logging
+/logs/*
+!/logs/.gitkeep
+*.log
+*.log.*
+
+# Environments
+.env
+.venv
+env/
+venv/
+venv_win/
+ENV/
+env.bak/
+venv.bak/
+
+# User generated output
+/apps/*
+!/apps/.gitkeep
