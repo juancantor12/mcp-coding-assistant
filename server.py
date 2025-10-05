@@ -1,12 +1,10 @@
 """
 FastMCP quickstart example.
 """
-print("__name__: "+__name__)
 import sys
 import os
 # Add the parent directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-print("sys.path:", sys.path)
 
 from tools import dirx, filex
 from globals import PROJECTS, ALLOWED_EXTENSIONS
@@ -60,9 +58,12 @@ def load_file(project: str, path: str) -> str:
     return filex.load(project, path)
 
 @mcp.tool()
-def execute_file(project: str = "test", path: str = "b/x.py", args: list[str] = ["a", "-v", "1"], as_module: bool = False) -> dict[str, str]:
+def execute_file(
+        project: str = "test", path: str = "b/x.py", args: list[str] = ["a", "-v", "1"], as_module: bool = False
+    ) -> dict[str, str]:
     """loads a file at the given path"""
-    return filex.execute(project, path, args, as_module)
+    result = filex.execute(project, path, args, as_module)
+    return result
 
 @mcp.tool()
 def remove_file(project: str, path: str) -> bool:

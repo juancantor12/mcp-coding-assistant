@@ -1,12 +1,12 @@
 """ Dir manipulation tools"""
 from collections import defaultdict
 import os
-from localmcp.globals import BASE_PATH, PROJECTS
+GLOBALS  = __import__("mcp-coding-assistant.globals", fromlist=[None]) #import GLOBALS.BASE_PATH, GLOBALS.PROJECTS
 
 def make(project: str, path: str) -> bool:
     """Creates a folder at the specified path"""
-    if project in PROJECTS:
-        target_path = BASE_PATH + project + "/" + path
+    if project in GLOBALS.PROJECTS:
+        target_path = GLOBALS.BASE_PATH + project + "/" + path
         if not os.path.isdir(target_path):
             os.mkdir(target_path)
         return True
@@ -15,9 +15,9 @@ def make(project: str, path: str) -> bool:
 def rename(project: str, old_path: str, new_path: str) -> bool:
     """Creates a folder at the specified path"""
 
-    if project in PROJECTS:
-        path_to_rename = BASE_PATH + project + "/" + old_path
-        new_path = BASE_PATH + project + "/" + new_path
+    if project in GLOBALS.PROJECTS:
+        path_to_rename = GLOBALS.BASE_PATH + project + "/" + old_path
+        new_path = GLOBALS.BASE_PATH + project + "/" + new_path
         if os.path.isdir(path_to_rename):
             os.rename(path_to_rename, new_path)
         return True
@@ -25,7 +25,7 @@ def rename(project: str, old_path: str, new_path: str) -> bool:
 
 def scaffolding(project: str):
     """Retrieves the project scaffolding in a dict (json) shape"""
-    if project in PROJECTS:
+    if project in GLOBALS.PROJECTS:
         folder_dict = {
             "folder_name": project,
             "files": [],
@@ -33,7 +33,7 @@ def scaffolding(project: str):
         }
 
         try:
-            for entry in os.scandir(BASE_PATH + "/" + project):
+            for entry in os.scandir(GLOBALS.BASE_PATH + "/" + project):
                 if entry.is_file():
                     folder_dict["files"].append(entry.name)
                 elif entry.is_dir():
@@ -51,10 +51,10 @@ def inverted_index(project: str, path: str = None, pre_index: dict = None):
     and the associated full flat paths as values for searching
     """
     index = defaultdict(list) if not pre_index else pre_index
-    if project in PROJECTS:
+    if project in GLOBALS.PROJECTS:
         try:
             scan_path = project if not path else path
-            for entry in os.scandir(BASE_PATH + "/" + scan_path):
+            for entry in os.scandir(GLOBALS.BASE_PATH + "/" + scan_path):
                 if entry.is_file():
                     name, extension = entry.name.split(".")
                     index[extension].append(entry.path)
