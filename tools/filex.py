@@ -46,26 +46,21 @@ def remove(project: str, path: str) -> bool:
     raise ValueError("Invalid project")
 
 
-def execute(project: str, path: str, args: list[str], as_module: bool = False ) -> dict[str, str]:
+def execute(project: str, path: str, args: list[str]) -> dict[str, any]:
     """Executes a python script with the specified params"""
-    # TODO: popen always hangs when running any pyton program, it never exits, surrogat the call to a bash file that sets up
-    # and runs a docker image with the actual script or code to run and wrap the call.
     # Check If correct project
     if project in GLOBALS.PROJECTS:
         file_path = GLOBALS.BASE_PATH + project + "/" + path
         # Check if the file exists
         if os.path.exists(file_path):
-            command = [sys.executable, "-u"]
-            if as_module:
-                command.append("-m")
-            command.append(file_path)
-            command.extend(args)
-            result = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False, text=True, creationflags = subprocess.CREATE_NEW_CONSOLE)
-            for line in iter(result.stdout.readline, ""):
-                return {"line": line}
-            # return {
-            #     "stdout": stdout,
-            #     "stderr": stderr
-            # }
+            command = [sys.executable, file_path] + args
+            with subprocess.Popen(
+                command,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            ) as process:
+                outs, errs = process.communicate()
+                return { "outs":outs, "errs":errs}
         raise ValueError("File doesn't exists")
     raise ValueError("Invalid project")

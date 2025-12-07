@@ -39,12 +39,12 @@ def rename_dir(project: str, old_path: str, new_path: str) -> bool:
 @mcp.tool()
 def get_project_scaffolding(project: str):
     """Retrieves the project scaffolding in a dict shape"""
-    return dirx.scaffolding(project)
+    return dirx.scaffolding(project=project)
 
 @mcp.tool()
 def get_files_inverted_index(project: str):
     """Retrieves the project scaffolding in a dict shape"""
-    return dirx.inverted_index(project)
+    return dirx.inverted_index(project=project)
 
 
 @mcp.tool()
@@ -59,10 +59,10 @@ def load_file(project: str, path: str) -> str:
 
 @mcp.tool()
 def execute_file(
-        project: str = "test", path: str = "b/x.py", args: list[str] = ["a", "-v", "1"], as_module: bool = False
+        project: str = "test", path: str = "b/x.py", args: list[str] = ["a", "-v", "1"]
     ) -> dict[str, str]:
     """loads a file at the given path"""
-    result = filex.execute(project, path, args, as_module)
+    result = filex.execute(project, path, args)
     return result
 
 @mcp.tool()
