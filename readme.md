@@ -5,3 +5,4 @@ To run:
  - when the webapp launches, connect with:
  	- command: mcp run
  	- arguments: server.py
+todo:
