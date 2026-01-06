@@ -6,3 +6,4 @@ To run:
  	- command: mcp run
  	- arguments: server.py
 todo:
+ - Start developing client
