@@ -1,3 +1,4 @@
+
 # MCP Coding Assistant
 
 A small MCP server that exposes file and project tools, plus a first-pass code
