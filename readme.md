@@ -18,6 +18,8 @@ Use the terminal chat client to talk to Ollama and propose graph changes:
 python cli.py --project test --model llama3.1
 ```
 Commands: `/actions`, `/help`, `/exit`
+If you omit `--project`, the CLI will prompt you to select or create one.
+Model defaults come from `OLLAMA_MODEL`/`OLLAMA_URL` or `globals.py`.
 
 ## Interpreter entry point
 Apply approved graph proposals to code (internal use):
@@ -75,6 +77,8 @@ Edge shape:
   proposal under `graphs/proposals/<project>/`.
 - `apply_graph_proposal(project, proposal_path)` applies a proposal to code and
   updates the graph (python-only, add-node/edge only).
+- `create_project(project, description)` creates a new project and writes its
+  `readme.md`.
 - `git_status()` returns `git status -sb`.
 - `git_add_all()` runs `git add .`.
 - `git_commit(message)` runs `git commit -m <message>`.

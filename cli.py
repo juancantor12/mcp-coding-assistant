@@ -3,17 +3,20 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import urllib.request
 from typing import Any
 
 from server import (
     build_code_graph,
+    create_project,
     list_available_extensions,
     list_available_projects,
     query_code_graph,
     save_graph_proposal,
 )
+from globals import DEFAULT_OLLAMA_MODEL, DEFAULT_OLLAMA_URL
 
 
 TOOL_DEFS = [
@@ -166,20 +169,53 @@ class AgentTerminal:
             print(f"\nAssistant> {message}\n")
 
 
+def _select_project() -> str:
+    while True:
+        projects = list_available_projects()
+        print("Available projects:")
+        if projects:
+            for idx, name in enumerate(projects, start=1):
+                print(f"{idx}. {name}")
+        else:
+            print("(none)")
+        choice = input("Select project by number, or type 'new': ").strip()
+        if choice.lower() == "new":
+            name = input("New project name: ").strip()
+            if not name:
+                print("Project name is required.")
+                continue
+            description = input("Project description: ").strip()
+            if not description:
+                print("Project description is required.")
+                continue
+            try:
+                result = create_project(name, description)
+                print(f"Created {result['project']}")
+                return result["project"]
+            except Exception as exc:
+                print(f"Error: {exc}")
+                continue
+        if choice.isdigit():
+            idx = int(choice)
+            if 1 <= idx <= len(projects):
+                return projects[idx - 1]
+        print("Invalid selection.")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Interactive terminal for Ollama-driven graph proposals."
     )
-    parser.add_argument("--project", default="test", help="Target project name.")
-    parser.add_argument("--model", default="llama3.1", help="Ollama model name.")
-    parser.add_argument(
-        "--ollama-url",
-        default="http://localhost:11434",
-        help="Base URL for Ollama.",
-    )
+    parser.add_argument("--project", help="Target project name.")
+    parser.add_argument("--model", help="Ollama model name.")
+    parser.add_argument("--ollama-url", help="Base URL for Ollama.")
     args = parser.parse_args()
 
-    terminal = AgentTerminal(args.project, args.model, args.ollama_url)
+    project = args.project or _select_project()
+    model = args.model or os.getenv("OLLAMA_MODEL") or DEFAULT_OLLAMA_MODEL
+    base_url = args.ollama_url or os.getenv("OLLAMA_URL") or DEFAULT_OLLAMA_URL
+
+    terminal = AgentTerminal(project, model, base_url)
     terminal.run()
     return 0
 

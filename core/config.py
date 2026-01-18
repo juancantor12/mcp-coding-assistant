@@ -6,6 +6,8 @@ from typing import Set
 
 from pydantic import BaseModel, Field
 
+from core.registry import ProjectRegistry
+
 
 class AppConfig(BaseModel):
     base_path: str = Field(..., description="Absolute path to apps root")
@@ -18,8 +20,11 @@ class AppConfig(BaseModel):
     def from_globals(cls) -> "AppConfig":
         globals_mod = __import__("mcp-coding-assistant.globals", fromlist=[None])
         base_path = os.path.abspath(globals_mod.BASE_PATH)
+        base_projects = set(getattr(globals_mod, "PROJECTS", set()))
+        registry = ProjectRegistry(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+        registered = registry.load()
         return cls(
             base_path=base_path,
-            projects=set(globals_mod.PROJECTS),
+            projects=base_projects.union(registered),
             allowed_extensions=set(globals_mod.ALLOWED_EXTENSIONS),
         )

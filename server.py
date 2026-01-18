@@ -12,7 +12,7 @@ from core.git import GitService
 from core.graph import GraphService
 from core.interpreter import GraphChangeApplier
 from core.projects import ProjectManager
-from globals import PROJECTS, ALLOWED_EXTENSIONS
+from core.registry import ProjectRegistry
 from mcp.server.fastmcp import FastMCP
 
 # Create an MCP server
@@ -23,18 +23,44 @@ files = FileService(config, projects)
 graphs = GraphService(config)
 interpreter = GraphChangeApplier(config, projects, files, graphs)
 git = GitService(os.path.abspath(os.path.dirname(__file__)))
+registry = ProjectRegistry(os.path.abspath(os.path.dirname(__file__)))
 
 
 @mcp.resource("resource://listx_available_projects")
 def list_available_projects() -> str:
     """Return the list of available build paths"""
-    return PROJECTS
+    return sorted(config.projects)
 
 
 @mcp.resource("resource://list_available_extensions")
 def list_available_extensions() -> str:
     """Return the list of available file extensions"""
-    return ALLOWED_EXTENSIONS
+    return sorted(config.allowed_extensions)
+
+@mcp.tool()
+def create_project(project: str, description: str) -> dict[str, str]:
+    """Creates a new project with a README description."""
+    if not project or not project.replace("-", "").replace("_", "").isalnum():
+        raise ValueError("Project name must be alphanumeric with - or _")
+    if project in config.projects:
+        raise ValueError("Project already exists")
+    if not description or not description.strip():
+        raise ValueError("Project description is required")
+
+    project_root = os.path.join(config.base_path, project)
+    os.makedirs(project_root, exist_ok=True)
+    readme_path = os.path.join(project_root, "readme.md")
+    if not os.path.exists(readme_path):
+        with open(readme_path, "w", encoding="UTF-8") as handle:
+            handle.write(f"# {project}\n\n{description.strip()}\n")
+
+    config.projects.add(project)
+    registry.add(project)
+    return {
+        "created": "true",
+        "project": project,
+        "readme": readme_path.replace("\\", "/"),
+    }
 
 @mcp.tool()
 def make_dir(project: str, path: str) -> bool:

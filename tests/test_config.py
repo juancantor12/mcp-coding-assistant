@@ -5,6 +5,7 @@ import os
 from types import SimpleNamespace
 
 from core.config import AppConfig
+from core.registry import ProjectRegistry
 
 
 def test_app_config_from_globals_monkeypatched(monkeypatch) -> None:
@@ -16,6 +17,7 @@ def test_app_config_from_globals_monkeypatched(monkeypatch) -> None:
     monkeypatch.setitem(
         __import__("sys").modules, "mcp-coding-assistant.globals", fake_globals
     )
+    monkeypatch.setattr(ProjectRegistry, "load", lambda self: set())
     config = AppConfig.from_globals()
 
     assert os.path.isabs(config.base_path)
