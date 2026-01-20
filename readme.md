@@ -15,7 +15,7 @@ graph indexer meant to keep model context tight by pointing to exact file spans.
 ## CLI entry point
 Use the terminal chat client to talk to Ollama and propose graph changes:
 ```
-python cli.py --project test --model llama3.1
+python cli.py
 ```
 Commands: `/actions`, `/help`, `/exit`
 If you omit `--project`, the CLI will prompt you to select or create one.
